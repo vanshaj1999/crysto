@@ -2,10 +2,10 @@
 
 [![check](https://github.com/vanshaj1999/crysto/actions/workflows/check.yml/badge.svg)](https://github.com/vanshaj1999/crysto/actions/workflows/check.yml)
 
-Crysto is my personal AI system. It is not one app. It is a small set of rules, files and
-connectors that lets several AI agents work on my personal projects without stepping on each other:
-Claude Code on two separate accounts, OpenAI Codex, free models through OpenCode, and Claude on my
-phone.
+Crysto is my AI engineering partner and personal assistant. It supports my professional work and
+my personal life, each on its own isolated setup. It is not one app. It is a set of rules, files
+and connectors that lets several AI agents work together without stepping on each other: Claude
+Code, OpenAI Codex, free models through OpenCode, and Claude on my phone.
 
 This repo holds the design and the reusable parts: the architecture, the coordination protocol the
 agents follow, project templates and a script that creates a new project with all of it in place.
@@ -16,8 +16,8 @@ My memory files, mail, health data and project notes are not here, by design.
 | Part | What it does | Status |
 | --- | --- | --- |
 | Hub | One chat for anything personal. Lists every project and sends real work to that project's own workspace. | Live |
-| Projects | One folder per project (tax, passport, website, fitness, markets...), each with its own `CLAUDE.md`, `STATUS.md` and memory. | Live, 9 projects |
-| Two Claude accounts | Personal and work subscriptions side by side, picked automatically by directory. | Live |
+| Projects | One folder per project (tax, passport, website, fitness, markets...), each with its own `CLAUDE.md`, `STATUS.md` and memory. | Live, multiple projects |
+| Work and personal sides | Separate accounts, credentials and memory for professional and personal work, picked automatically by directory. | Live |
 | Agent team | Claude leads and reviews. Codex and free OpenCode models do the heavy lifting from written briefs. | Live |
 | Health coach | An MCP server over the Google Health API, used by a Claude Project on my phone. | Live, [fitbit-googlehealth-mcp](https://github.com/vanshaj1999/fitbit-googlehealth-mcp) |
 | Markets agent | Paper-trading agent on Cloudflare Workers with MCP tools for Claude. | Live, [crysto-markets](https://github.com/vanshaj1999/crysto-markets) |
@@ -102,7 +102,7 @@ top.
 
 - Memory, project notes, mail, calendar, health and money data.
 - The briefs and logs of individual agent runs.
-- Anything from my day job. A separate work setup uses the same patterns, and none of it is in this
-  repo.
+- Anything from my professional work. Crysto supports it on a separate, isolated setup, and no
+  employer or client code, data or names are in this repo.
 
 MIT licensed.
