@@ -29,6 +29,20 @@ research/
 `STATUS.md` is the most important file in the system. A new session, on any model, reads it first
 and does not rediscover what is already written there.
 
+```mermaid
+stateDiagram-v2
+    state "WAITING ON OWNER" as WaitingOnOwner
+    [*] --> CLAIMED
+    CLAIMED --> PAUSED
+    CLAIMED --> WaitingOnOwner
+    CLAIMED --> DONE
+    PAUSED --> CLAIMED
+    WaitingOnOwner --> CLAIMED
+    PAUSED --> DONE
+    WaitingOnOwner --> DONE
+    DONE --> [*]
+```
+
 ## 3. Memory
 
 Claude Code keeps a memory folder per project directory. Crysto uses it with three rules:
@@ -50,10 +64,29 @@ New projects start with a seeded memory folder (see
 | --- | --- | --- |
 | Claude Code (personal account) | Lead: plans, writes briefs and hidden tests, reviews every diff, publishes | Best judgement; its time is the scarcest |
 | Codex | Long jobs: builds a project from a brief, browser and form work | Runs unattended for long stretches and writes a handover |
-| OpenCode with free models | Bounded fixes and refactors, several models in parallel | Cost is zero, so I can run five and keep the best |
+| OpenCode with smaller models | Bounded fixes and refactors, several models in parallel | I can run five on one task and keep the best |
 | Claude app on the phone | Daily coaching and questions, through custom connectors | Same data as the Mac, through the MCP servers |
 
 The flow for a build:
+
+```mermaid
+sequenceDiagram
+    title The build loop
+    participant Lead as Lead (Claude Code)
+    participant Files as Shared files
+    participant Builder as Builder (Codex or OpenCode model)
+    Lead->>Files: Write brief and hidden tests
+    Lead->>Files: Claim task in COORDINATION.md
+    Lead->>Builder: Assign brief, keep hidden tests private
+    Builder->>Builder: Build headless
+    Builder->>Files: Write HANDOVER.md
+    Lead->>Files: Run hidden tests and read the diff
+    alt Review passes
+        Lead->>Files: Ship reviewed changes
+    else Changes required
+        Lead->>Builder: Send task back with review notes
+    end
+```
 
 1. Claude writes a brief: goal, files in scope, rules, the commands that prove it works, and what
    not to touch. Template: [templates/AGENT-BRIEF.md](../templates/AGENT-BRIEF.md).
@@ -63,7 +96,7 @@ The flow for a build:
 4. Claude runs the hidden tests, reads the full diff and checks every claim in the handover against
    the files. Nothing ships on the agent's word alone.
 
-Personal code goes only to models I trust with it. Free models get public open source work.
+Personal code goes only to models I trust with it. Smaller hosted models get public open source work.
 
 ## 5. Connectors
 
@@ -99,5 +132,5 @@ Two things I learned the hard way:
 
 Every agent writes reports, handovers and plans in a controlled English based on ASD-STE100: short
 sentences, active voice, one instruction per sentence, no idioms. It exists for the next agent, not
-for style. A handover from a free model reads the same as one from Claude, and ambiguous phrasing
+for style. A handover from a smaller model reads the same as one from Claude, and ambiguous phrasing
 is where handovers go wrong. Code, commands and user-facing copy keep their own style.

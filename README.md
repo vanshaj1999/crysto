@@ -1,24 +1,30 @@
 # crysto
 
-[![check](https://github.com/vanshaj1999/crysto/actions/workflows/check.yml/badge.svg)](https://github.com/vanshaj1999/crysto/actions/workflows/check.yml)
+File-based coordination for an AI engineering team, with briefs, task claims and reviewed handovers.
+
+[![check](https://github.com/vanshaj1999/crysto/actions/workflows/check.yml/badge.svg)](https://github.com/vanshaj1999/crysto/actions/workflows/check.yml) [![MIT licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE) ![shell: bash + zsh](https://img.shields.io/badge/shell-bash%20%2B%20zsh-4EAA25) ![MCP](https://img.shields.io/badge/MCP-protocol-555555) ![Claude Code](https://img.shields.io/badge/Claude-Code-D97757) ![Codex](https://img.shields.io/badge/Codex-builder-412991)
+
+![Terminal demo of project creation and checks](docs/media/demo.gif)
+
+A real terminal run of `scripts/new-project.sh` and `make check`.
 
 Crysto is my AI engineering partner and personal assistant. It supports my professional work and
 my personal life, each on its own isolated setup. It is not one app. It is a set of rules, files
 and connectors that lets several AI agents work together without stepping on each other: Claude
-Code, OpenAI Codex, free models through OpenCode, and Claude on my phone.
+Code, OpenAI Codex, smaller models through OpenCode, and Claude on my phone.
 
 This repo holds the design and the reusable parts: the architecture, the coordination protocol the
 agents follow, project templates and a script that creates a new project with all of it in place.
-My memory files, mail, health data and project notes are not here, by design.
+Private memory files, mail, connector data and project notes stay outside this repo.
 
 ## What it runs today
 
 | Part | What it does | Status |
 | --- | --- | --- |
 | Hub | One chat for anything personal. Lists every project and sends real work to that project's own workspace. | Live |
-| Projects | One folder per project (website, fitness, markets, research...), each with its own `CLAUDE.md`, `STATUS.md` and memory. | Live, multiple projects |
+| Projects | One folder per project (websites, fitness, markets and research), each with its own `CLAUDE.md`, `STATUS.md` and memory. | Live, multiple projects |
 | Work and personal sides | Separate accounts, credentials and memory for professional and personal work, picked automatically by directory. | Live |
-| Agent team | Claude leads and reviews. Codex and free OpenCode models do the heavy lifting from written briefs. | Live |
+| Agent team | Claude leads and reviews. Codex and smaller OpenCode models do the heavy lifting from written briefs. | Live |
 | Health coach | An MCP server over the Google Health API, used by a Claude Project on my phone. | Live, [fitbit-googlehealth-mcp](https://github.com/vanshaj1999/fitbit-googlehealth-mcp) |
 | Markets agent | Paper-trading agent on Cloudflare Workers with MCP tools for Claude. | Live, [crysto-markets](https://github.com/vanshaj1999/crysto-markets) |
 | Retrieval lab | Measured RAG experiments that feed back into how I build retrieval. | [rag-eval-lab](https://github.com/vanshaj1999/rag-eval-lab) |
@@ -26,21 +32,21 @@ My memory files, mail, health data and project notes are not here, by design.
 
 ```mermaid
 flowchart TB
-    me([Me: terminal, phone, car])
-    subgraph mac[Mac]
-        hub[Hub: crysto/<br/>PROJECTS.md, COORDINATION.md]
-        p1[project A<br/>CLAUDE.md, STATUS.md]
-        p2[project B]
-        mem[(Memory<br/>one fact per file)]
-        cc[Claude Code<br/>personal account]
-        codex[Codex]
-        oc[OpenCode<br/>free models]
+    me(["Me: terminal, phone, car"])
+    subgraph mac["Mac"]
+        hub["Hub: crysto/, PROJECTS.md, COORDINATION.md"]
+        p1["Project A: CLAUDE.md, STATUS.md"]
+        p2["Project B"]
+        mem[("Memory: one fact per file")]
+        cc["Claude Code: personal account"]
+        codex["Codex"]
+        oc["OpenCode: smaller models"]
     end
-    subgraph cloud[Cloud, free tiers]
-        health[Health MCP server<br/>Cloudflare Worker]
-        markets[Markets MCP server<br/>Cloudflare Worker]
+    subgraph cloud["Cloud services"]
+        health["Health MCP server: Cloudflare Worker"]
+        markets["Markets MCP server: Cloudflare Worker"]
     end
-    phone[Claude app on the phone<br/>Crysto Coach project]
+    phone["Claude app on the phone: Crysto Coach project"]
 
     me --> cc
     me --> phone
@@ -67,8 +73,8 @@ flowchart TB
    [the coordination protocol](docs/coordination-protocol.md).
 3. **One browser driver at a time.** Two agents on one Chrome debugging port crash each other. The
    claim covers the browser too.
-4. **The lead reviews, the cheap models build.** Claude writes the brief and the hidden tests,
-   Codex or a free model does the work, and Claude reads every diff before anything ships. A green
+4. **The lead reviews, the smaller models build.** Claude writes the brief and the hidden tests,
+   Codex or a smaller model does the work, and Claude reads every diff before anything ships. A green
    test run is not a review: in my own trials, models passed tests while deleting a test or
    reformatting files outside the task.
 5. **Accounts are picked by directory.** A `chpwd` hook sets `CLAUDE_CONFIG_DIR` and `GH_CONFIG_DIR`
@@ -78,6 +84,41 @@ flowchart TB
    passwords or bank details in any file. Public repos are fresh copies that pass a secret scan.
 7. **Write for the next agent.** Every agent writes in a controlled, plain English (based on
    ASD-STE100), so handovers read the same whichever model wrote them.
+
+```mermaid
+sequenceDiagram
+    title The build loop
+    participant Lead as Lead (Claude Code)
+    participant Files as Shared files
+    participant Builder as Builder (Codex or OpenCode model)
+    Lead->>Files: Write brief and hidden tests
+    Lead->>Files: Claim task in COORDINATION.md
+    Lead->>Builder: Assign brief, keep hidden tests private
+    Builder->>Builder: Build headless
+    Builder->>Files: Write HANDOVER.md
+    Lead->>Files: Run hidden tests and read the diff
+    alt Review passes
+        Lead->>Files: Ship reviewed changes
+    else Changes required
+        Lead->>Builder: Send task back with review notes
+    end
+```
+
+A task claim records the owner and its current state:
+
+```mermaid
+stateDiagram-v2
+    state "WAITING ON OWNER" as WaitingOnOwner
+    [*] --> CLAIMED
+    CLAIMED --> PAUSED
+    CLAIMED --> WaitingOnOwner
+    CLAIMED --> DONE
+    PAUSED --> CLAIMED
+    WaitingOnOwner --> CLAIMED
+    PAUSED --> DONE
+    WaitingOnOwner --> DONE
+    DONE --> [*]
+```
 
 More detail: [docs/architecture.md](docs/architecture.md).
 
@@ -98,11 +139,40 @@ seeded Claude memory folder and a row in `PROJECTS.md`. The templates it uses ar
 [shell/account-switch.zsh](shell/account-switch.zsh) from `~/.zshrc` and edit the paths at the
 top.
 
+## Repo layout
+
+```text
+.
+├── .github/workflows/check.yml
+├── .gitignore
+├── LICENSE
+├── Makefile
+├── README.md
+├── docs/
+│   ├── architecture.md
+│   ├── coordination-protocol.md
+│   ├── media/demo.gif
+│   └── voice-assistant-design.md
+├── scripts/new-project.sh
+├── shell/account-switch.zsh
+├── templates/
+│   ├── AGENT-BRIEF.md
+│   ├── CLAUDE.md
+│   ├── COORDINATION.md
+│   ├── HANDOVER.md
+│   ├── PROJECTS.md
+│   ├── STATUS.md
+│   └── memory-seed/feedback-read-status-first.md
+└── tests/test_new_project.sh
+```
+
+The tree includes local task files and the run log. These are not reusable project templates.
+
 ## What is not here
 
-- Memory, project notes, mail, calendar, health and money data.
+- Private memory, project notes, mail, calendar and connector data.
 - The briefs and logs of individual agent runs.
 - Anything from my professional work. Crysto supports it on a separate, isolated setup, and no
-  employer or client code, data or names are in this repo.
+  client code, private data or organisation names are in this repo.
 
 MIT licensed.
