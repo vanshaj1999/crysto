@@ -20,7 +20,7 @@ switching to that project's own workspace, so the notes and memory land in the r
 Each project is a folder with git, created by [`scripts/new-project.sh`](../scripts/new-project.sh):
 
 ```
-tax/
+research/
   CLAUDE.md     rules for this project, read at the start of every session
   STATUS.md     where the work is, updated before a session ends
   private/      gitignored: documents, never committed
@@ -49,7 +49,7 @@ New projects start with a seeded memory folder (see
 | Agent | Role | Why |
 | --- | --- | --- |
 | Claude Code (personal account) | Lead: plans, writes briefs and hidden tests, reviews every diff, publishes | Best judgement; its time is the scarcest |
-| Codex | Long jobs: builds a project from a brief, browser and form work | Runs unattended for an hour and writes a handover |
+| Codex | Long jobs: builds a project from a brief, browser and form work | Runs unattended for long stretches and writes a handover |
 | OpenCode with free models | Bounded fixes and refactors, several models in parallel | Cost is zero, so I can run five and keep the best |
 | Claude app on the phone | Daily coaching and questions, through custom connectors | Same data as the Mac, through the MCP servers |
 

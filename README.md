@@ -16,7 +16,7 @@ My memory files, mail, health data and project notes are not here, by design.
 | Part | What it does | Status |
 | --- | --- | --- |
 | Hub | One chat for anything personal. Lists every project and sends real work to that project's own workspace. | Live |
-| Projects | One folder per project (tax, passport, website, fitness, markets...), each with its own `CLAUDE.md`, `STATUS.md` and memory. | Live, multiple projects |
+| Projects | One folder per project (website, fitness, markets, research...), each with its own `CLAUDE.md`, `STATUS.md` and memory. | Live, multiple projects |
 | Work and personal sides | Separate accounts, credentials and memory for professional and personal work, picked automatically by directory. | Live |
 | Agent team | Claude leads and reviews. Codex and free OpenCode models do the heavy lifting from written briefs. | Live |
 | Health coach | An MCP server over the Google Health API, used by a Claude Project on my phone. | Live, [fitbit-googlehealth-mcp](https://github.com/vanshaj1999/fitbit-googlehealth-mcp) |
@@ -89,7 +89,7 @@ cd ~/personal/crysto
 make test
 
 # create a project under $CRYSTO_ROOT (default: the folder above this repo)
-scripts/new-project.sh tax
+scripts/new-project.sh research
 ```
 
 `new-project.sh` creates the folder, git, `CLAUDE.md`, `STATUS.md`, a gitignored `private/`, a
