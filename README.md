@@ -8,6 +8,8 @@ File-based coordination for an AI engineering team, with briefs, task claims and
 
 A real terminal run of `scripts/new-project.sh` and `make check`.
 
+**Interactive diagrams:** [vanshaj1999.github.io/crysto](https://vanshaj1999.github.io/crysto/), click any layer or step for the details.
+
 Crysto is my AI engineering partner and personal assistant. It supports my professional work and
 my personal life, each on its own isolated setup. It is not one app. It is a set of rules, files
 and connectors that lets several AI agents work together without stepping on each other: Claude
@@ -151,6 +153,7 @@ top.
 ├── docs/
 │   ├── architecture.md
 │   ├── coordination-protocol.md
+│   ├── index.html
 │   ├── media/demo.gif
 │   └── voice-assistant-design.md
 ├── scripts/new-project.sh
